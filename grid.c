@@ -53,7 +53,7 @@ entity *newBulb(cell grid[H][W], int x, int y)
   grid[y][x].background = newEntity(passable,'0',x,y);
   grid[y+3][x].background = newEntity(passable,'-',x,y+3);
   grid[y+3][x].background->pointsto = grid[y][x].background;
-  
+
   return grid[y][x].background;
 }
 
@@ -136,7 +136,7 @@ void move(cell *c, int x, int y, direction dir, cell grid[H][W]) {
 void printGrid(cell grid[H][W])
 {
   int HCnt, WCnt;
-  
+
   printf("\n");
   for(HCnt=0; HCnt<H; HCnt++){
     for(WCnt=0; WCnt<W; WCnt++){
@@ -231,5 +231,3 @@ void testGrid(SDL_Simplewin *sw) {
 
   freeEntityMem(grid);
 }
-
-
