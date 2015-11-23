@@ -2,7 +2,11 @@
 #include <stdio.h>
 #include <time.h>
 
+<<<<<<< HEAD
 #define H 14
+=======
+#define H 12
+>>>>>>> 87d4ce69c445bfe7316a1e37f08adf18640762a1
 #define W 12
 
 typedef enum direction { LEFT = 1, RIGHT = 2, UP = 3, DOWN = 4 } direction;
@@ -47,7 +51,11 @@ void initGrid(cell grid[H][W]);
 entity *newEntity(int ispassable, char type, int x, int y);
 
 /* creates a new bulb-switch pair */
+<<<<<<< HEAD
 entity *newBulb(cell grid[H][W], int x, int y);
+=======
+void newBulb(cell grid[H][W], int x, int y);
+>>>>>>> 87d4ce69c445bfe7316a1e37f08adf18640762a1
 
 /* placeholder function to fill grid with floor entities */
 void fillGrid(cell grid[H][W]);
@@ -59,6 +67,10 @@ void printGrid(cell grid[H][W]);
 /* frees the memory used by malloc in the newEntity() function*/
 void freeEntityMem(cell grid[H][W]);
 
+<<<<<<< HEAD
 /* checks conditions and changes entities which need changing */
 void updateEntities(cell grid[H][W]);
 
+=======
+void testGrid(SDL_Simplewin *sw);
+>>>>>>> 87d4ce69c445bfe7316a1e37f08adf18640762a1
