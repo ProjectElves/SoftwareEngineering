@@ -16,9 +16,11 @@ char enc_constant();
 void enc_changeRow(char word[LENGTH], int size);
 void enc_change(char word[LENGTH], int size, int game);
 void encrytionGridInit(char *shuffle_word);
-entity *enc_newLetter(cell grid[H][W], int x, int y, char c);
-
-
+void enc_newLetter(cell grid[H][W], int x, int y, char c);
+void enc_updateLetter(cell grid[H][W], int y, int x);
+void enc_letterDown(entity *e);
+void enc_letterUp(entity *e);
+//char *enc_updateWord(cell grid[H][W], int y, int x, int size);
 
 int encryptionNew(SDL_Simplewin *sw)
 {
@@ -26,8 +28,8 @@ int encryptionNew(SDL_Simplewin *sw)
   char rand_word[LENGTH], shuffle_word[LENGTH];
   int i, word_size, j, yinit = H/2, xinit = 1;
   cell grid[H][W];
-  entity *player, *byte[BYTE_L];
-  int in, goal, res;
+  entity *player;
+  int in;
   initGrid(grid);
 
   srand(time(NULL));
@@ -45,15 +47,13 @@ int encryptionNew(SDL_Simplewin *sw)
   printf("%s\n", shuffle_word);
 
   player = grid[10][10].foreground = newEntity(passable,'@',10,10);
-  /* 8 lightbytes and 8 switches */
+  /* place the word in the grid */
   for (j=0; j<word_size; j++){
-    byte[j] = enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
+    enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
   }
-  /*layer of floortiles */
+  /*layer of floor tiles */
   fillGrid(grid);
-  goal = rand()%255;
-  printf("try summing %d\n", goal );
-  //printf("result: %d\n", binResult(byte) );
+  printf("try to find the correct word");
 
   /* MAIN LOOP */
   while(!sw->finished){
@@ -64,37 +64,82 @@ int encryptionNew(SDL_Simplewin *sw)
     }
     if (in == 9) { /*checks for spacebar */
       if( grid[player->y][player->x].background != NULL
-      &&  grid[player->y][player->x].background->type == '-') {
-        changeEntity(grid[player->y][player->x].background,'+');
-        updateEntities(grid);
+      &&  grid[player->y][player->x].background->type == 'v') {
+        enc_updateLetter(grid, player->y, player->x);
         printGrid(grid);
       }
     else if( grid[player->y][player->x].background != NULL
-      &&  grid[player->y][player->x].background->type == '+') {
-        changeEntity(grid[player->y][player->x].background,'-');
-        updateEntities(grid);
+      &&  grid[player->y][player->x].background->type == '^') {
+        enc_updateLetter(grid, player->y, player->x);
         printGrid(grid);
       }
     }
-    // res=binResult(byte);
-    // printf("result %d\n",res);
-    if(res==goal){
+    //shuffle_word = enc_updateWord(grid, yinit, xinit, word_size);
+    printf("shuffle word: %s  initial word: %s \n",shuffle_word, rand_word);
+    if(shuffle_word == rand_word){
       break;
     }
   }
-
   printf("you win\n");
   freeEntityMem(grid);  /* free memory */
-
   return 0;
 }
 
-entity *enc_newLetter(cell grid[H][W], int x, int y, char c){
+// char *enc_updateWord(cell grid[H][W], int y, int x, int size){
+//
+//     int i=0;
+//     char *temp = (char *)malloc(sizeof(size * char));
+//
+//    for( ; x<size; x++){
+//       temp[i++] =
+//    }
+// }
+
+void enc_updateLetter(cell grid[H][W], int y, int x){
+
+   if ((grid[y][x].background->type == 'v') &&
+      (grid[y][x].background->pointsto != NULL)) {// cause 'v' may be from the word
+     enc_letterUp(grid[y][x].background->pointsto);
+   }
+   // we don't have && cause '^' is surely not part of the word
+   if (grid[y][x].background->type == '^'){
+     enc_letterDown(grid[y][x].background->pointsto);
+   }
+}
+
+void enc_letterDown(entity *e){
+   int letter = (int) e->type;
+
+   if( letter == (int) 'a'){
+      letter += 25;
+      e->type = (char) letter;
+   }
+   else{
+      letter--;
+      e->type = (char) letter;
+   }
+}
+
+void enc_letterUp(entity *e){
+   int letter = (int) e->type;
+
+   if( letter == (int) 'z'){
+      letter -= 25;
+      e->type = (char) letter;
+   }
+   else{
+      letter++;
+      e->type = (char) letter;
+   }
+}
+
+void enc_newLetter(cell grid[H][W], int x, int y, char c){
   grid[y][x].background = newEntity(passable, c, x, y);
   grid[y-1][x].background = newEntity(passable,'^',x,y-1);
   grid[y-1][x].background->pointsto = grid[y][x].background;
   grid[y+1][x].background = newEntity(passable,'v',x,y-1);
   grid[y+1][x].background->pointsto = grid[y][x].background;
+
 }
 
 void enc_shufle(char word[LENGTH], int size){
