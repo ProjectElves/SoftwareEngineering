@@ -1,10 +1,10 @@
 /*new encrytion game encorpoprating the grid
 tasks -
-1. generate single random word
-2. generate the grid
-3. bring word into the grid
-4. bring in movement to the grid
-5. make movement change the word
+1. make movement change the word
+2. shuffling whole row
+3. changing whole row
+4. reset button
+5. cnt for score
  */
 #include "encryption.h"
 #include "game.h"
@@ -13,20 +13,20 @@ void enc_shufle(char word[LENGTH], int size);
 int enc_isenc_vowel(char c);
 char enc_vowel();
 char enc_constant();
-void enc_changeRow(char word[LENGTH], int size);
+void enc_changeRow(char word[LENGTH], int size, int shift);
 void enc_change(char word[LENGTH], int size, int game);
 void encrytionGridInit(char *shuffle_word);
 void enc_newLetter(cell grid[H][W], int x, int y, char c);
 void enc_updateLetter(cell grid[H][W], int y, int x);
 void enc_letterDown(entity *e);
 void enc_letterUp(entity *e);
-//char *enc_updateWord(cell grid[H][W], int y, int x, int size);
+void enc_updateWord(cell grid[H][W], int y, int x, char shuffle[LENGTH]);
 
 int encryptionNew(SDL_Simplewin *sw)
 {
   char *list[] = {"frondo", "gandalf","elrond", "legolas", "gimli", "aragorn","saouron"};
   char rand_word[LENGTH], shuffle_word[LENGTH];
-  int i, word_size, j, yinit = H/2, xinit = 1;
+  int i, word_size, j, yinit = H/2, xinit = 2;
   cell grid[H][W];
   entity *player;
   int in;
@@ -42,7 +42,7 @@ int encryptionNew(SDL_Simplewin *sw)
     shuffle_word[i] = rand_word[i];
   }
   shuffle_word[word_size] = '\0';
-  printf("\nThe initial word is %s and ", shuffle_word);
+  // printf("\nThe initial word is %s and ", shuffle_word);
   enc_shufle(shuffle_word, word_size);
   printf("%s\n", shuffle_word);
 
@@ -51,6 +51,9 @@ int encryptionNew(SDL_Simplewin *sw)
   for (j=0; j<word_size; j++){
     enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
   }
+  grid[yinit][xinit-1].background = newEntity(passable,'<',xinit-1,yinit);
+  grid[yinit][xinit+word_size].background = newEntity(passable,'>',xinit+word_size,yinit);
+
   /*layer of floor tiles */
   fillGrid(grid);
   printf("try to find the correct word");
@@ -63,20 +66,29 @@ int encryptionNew(SDL_Simplewin *sw)
       printGrid(grid);
     }
     if (in == 9) { /*checks for spacebar */
-      if( grid[player->y][player->x].background != NULL
-      &&  grid[player->y][player->x].background->type == 'v') {
+      if(grid[player->y][player->x].background->type == 'v') {
         enc_updateLetter(grid, player->y, player->x);
-        printGrid(grid);
       }
-    else if( grid[player->y][player->x].background != NULL
-      &&  grid[player->y][player->x].background->type == '^') {
+    else if(grid[player->y][player->x].background->type == '^') {
         enc_updateLetter(grid, player->y, player->x);
-        printGrid(grid);
       }
+      else if(grid[player->y][player->x].background->type == '<') {
+          enc_changeRow(shuffle_word, word_size, 1);
+          for (j=0; j<word_size; j++){
+            enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
+          }
+        }
+        else if(grid[player->y][player->x].background->type == '>') {
+            enc_changeRow(shuffle_word, word_size, -1);
+            for (j=0; j<word_size; j++){
+              enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
+            }
+          }
     }
-    //shuffle_word = enc_updateWord(grid, yinit, xinit, word_size);
-    printf("shuffle word: %s  initial word: %s \n",shuffle_word, rand_word);
-    if(shuffle_word == rand_word){
+    enc_updateWord(grid, yinit, xinit, shuffle_word);
+    printGrid(grid);
+    printf("%s\n",shuffle_word);
+    if(strcmp(shuffle_word, rand_word)==0){
       break;
     }
   }
@@ -85,15 +97,14 @@ int encryptionNew(SDL_Simplewin *sw)
   return 0;
 }
 
-// char *enc_updateWord(cell grid[H][W], int y, int x, int size){
-//
-//     int i=0;
-//     char *temp = (char *)malloc(sizeof(size * char));
-//
-//    for( ; x<size; x++){
-//       temp[i++] =
-//    }
-// }
+void enc_updateWord(cell grid[H][W], int y, int x, char shuffle[LENGTH]){
+
+    int i=0, size=strlen(shuffle);
+
+   for( ; x<size; x++){
+      shuffle[i++] = grid[y][x].background->type;
+   }
+}
 
 void enc_updateLetter(cell grid[H][W], int y, int x){
 
@@ -139,36 +150,40 @@ void enc_newLetter(cell grid[H][W], int x, int y, char c){
   grid[y-1][x].background->pointsto = grid[y][x].background;
   grid[y+1][x].background = newEntity(passable,'v',x,y-1);
   grid[y+1][x].background->pointsto = grid[y][x].background;
-
 }
 
 void enc_shufle(char word[LENGTH], int size){
   int game ;
 
-  game = rand()%2;
+  game = rand()%3;
   switch (game){
     case 0:
-      printf("we are going to enc_change a enc_vowel\n\n");
+      // printf("we are going to change a vowel\n\n");
       enc_change(word, size, game);
       break;
     case 1 :
-      printf("we are going to enc_change a enc_constant\n\n" );
+      // printf("we are going to change a constant\n\n" );
       enc_change(word, size, game);
       break;
     case 2 :
-      printf("we are going to switch the whole row\n\n" );
-      enc_changeRow(word, size);
+      // printf("we are going to switch the whole row\n\n" );
+      enc_changeRow(word, size, 0);
       break;
   }
 }
 
-void enc_changeRow(char word[LENGTH], int size){
-  int shift, i;
-
-  shift = rand()%ALPHABET;
+void enc_changeRow(char word[LENGTH], int size, int shift){
+  int i;
+  if(shift==0){
+  shift = rand()%(ALPHABET-1)+1;
+  // printf("shift = %d\n", shift);
+ }
   for (i=0; i<size; i++){
     word[i] = word[i] - shift;
-    if ((int)word[i] < (int) 'a'){
+    if ((int)word[i] > (int) 'z'){
+      word[i] = word[i] - ALPHABET;
+    }
+    else if ((int)word[i] < (int) 'a'){
       word[i] = word[i] + ALPHABET;
     }
   }
