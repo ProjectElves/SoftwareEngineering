@@ -25,7 +25,7 @@ void enc_updateWord(cell grid[H][W], int y, int x, char shuffle[LENGTH]);
 int encryptionNew(SDL_Simplewin *sw)
 {
   char *list[] = {"frondo", "gandalf","elrond", "legolas", "gimli", "aragorn","saouron"};
-  char rand_word[LENGTH], shuffle_word[LENGTH];
+  char rand_word[LENGTH], shuffle_word[LENGTH], orginal_word[LENGTH];
   int i, word_size, j, yinit = H/2, xinit = 2;
   cell grid[H][W];
   entity *player;
@@ -45,7 +45,7 @@ int encryptionNew(SDL_Simplewin *sw)
   // printf("\nThe initial word is %s and ", shuffle_word);
   enc_shufle(shuffle_word, word_size);
   printf("%s\n", shuffle_word);
-
+  strcpy(orginal_word, shuffle_word);
   player = grid[10][10].foreground = newEntity(passable,'@',10,10);
   /* place the word in the grid */
   for (j=0; j<word_size; j++){
@@ -53,6 +53,9 @@ int encryptionNew(SDL_Simplewin *sw)
   }
   grid[yinit][xinit-1].background = newEntity(passable,'<',xinit-1,yinit);
   grid[yinit][xinit+word_size].background = newEntity(passable,'>',xinit+word_size,yinit);
+  grid[0][0].background = newEntity(passable,'r',0,0);
+
+
 
   /*layer of floor tiles */
   fillGrid(grid);
@@ -78,12 +81,18 @@ int encryptionNew(SDL_Simplewin *sw)
             enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
           }
         }
-        else if(grid[player->y][player->x].background->type == '>') {
-            enc_changeRow(shuffle_word, word_size, -1);
-            for (j=0; j<word_size; j++){
-              enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
-            }
-          }
+     else if(grid[player->y][player->x].background->type == '>') {
+         enc_changeRow(shuffle_word, word_size, -1);
+         for (j=0; j<word_size; j++){
+           enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
+         }
+      }
+      else if(grid[player->y][player->x].background->type == 'r') {
+         for (j=0; j<word_size; j++){
+           enc_newLetter(grid, xinit+j, yinit, orginal_word[j]);
+
+         }
+       }
     }
     enc_updateWord(grid, yinit, xinit, shuffle_word);
     printGrid(grid);
