@@ -6,7 +6,10 @@ tasks -
 4. reset button done
 5. cnt for score done
 6. when shuffling shuffles all characters of the same type
+7. printing hint on the grid stay there,
+8. printing when reset for one cycle
  */
+
 #include "encryption.h"
 #include "game.h"
 
