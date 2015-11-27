@@ -8,6 +8,7 @@ tasks -
 6. when shuffling shuffles all characters of the same type
 7. printing hint on the grid stay there,
 8. printing when reset for one cycle
+9. not picking up elrond
  */
 
 #include "encryption.h"
@@ -31,6 +32,9 @@ void enc_Hint(int game);
 int encryptionNew(SDL_Simplewin *sw)
 {
   char *list[] = {"frondo", "gandalf","elrond", "legolas", "gimli", "aragorn","saouron"};
+  char hint0[]={"vowel             b"};
+  char hint1[]={"consonant               b"};
+  char hint2[]={"switch                 b"};
   char rand_word[LENGTH], shuffle_word[LENGTH], orginal_word[LENGTH];
   int i, word_size, j, yinit = H/2, xinit = 2, cnt=0, game;
   cell grid[H][W];
@@ -100,9 +104,27 @@ int encryptionNew(SDL_Simplewin *sw)
          }
        }
        else if(grid[player->y][player->x].background->type == 'H') {
-          enc_Hint(game);
+         switch (game){
+           case 0:
+           for (j=0; j<10; j++){
+               grid[3][j].background = newEntity(passable, hint0[j], xinit+j, 3);
+            }
+             break;
+           case 1 :
+           for (j=0; j<10; j++){
+             grid[3][j].background = newEntity(passable, hint1[j], j, 3);
+             }
+             break;
+           case 2 :
+           for (j=0; j<10; j++){
+             grid[3][j].background = newEntity(passable, hint2[j], xinit+j, 3);
+             }
+             break;
+          }
         }
-    }
+      }
+
+
     enc_updateWord(grid, yinit, xinit, shuffle_word);
     printGrid(grid);
     printf("%s\n",shuffle_word);
@@ -189,6 +211,7 @@ int enc_shufle(char word[LENGTH], int size){
   int game ;
 
   game = rand()%3;
+  game=1;
   switch (game){
     case 0:
       // printf("we are going to change a vowel\n\n");
