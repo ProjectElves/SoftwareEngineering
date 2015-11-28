@@ -75,10 +75,14 @@ int encryptionNew(SDL_Simplewin *sw)
     char hint0[]="vowel"; //variables have to be declared here otherwise dont work
     char hint1[]="consonant";
     char hint2[]="whole row";
+    char reset[]="reset";
 
     printf("%s", hint1);
 
     in=input(sw);
+    for (j=0; reset[j]!='\0'; j++){ //makes reset dissappear if set
+      grid[2][j].background = newEntity(passable, '.', j, 2);
+    }
     if( (in > 0) && (in < 5) ){ /*checks for arrowkeys */
       move(&grid[player->y][player->x],player->x,player->y,in,grid);
       printGrid(grid);
@@ -99,6 +103,9 @@ int encryptionNew(SDL_Simplewin *sw)
     else if(grid[player->y][player->x].background->type == 'r') {
          for (j=0; j<word_size; j++){
            enc_newLetter(grid, xinit+j, yinit, orginal_word[j]);
+           for (j=0; reset[j]!='\0'; j++){
+             grid[2][j].background = newEntity(passable, reset[j], j, 2);
+             }
          }
        }
      else if(grid[player->y][player->x].background->type == 'H') {
@@ -106,19 +113,16 @@ int encryptionNew(SDL_Simplewin *sw)
          case 0:
          for (j=0; hint1[j]!='\0'; j++){
            grid[3][j].background = newEntity(passable, hint0[j], j, 3);
-          //  printf("cnt=%d, string= %c\n", j, hint1);
            }
            break;
          case 1 :
          for (j=0; hint1[j]!='\0'; j++){
            grid[3][j].background = newEntity(passable, hint1[j], j, 3);
-          //  printf("cnt=%d, string= %c\n", j, hint1);
            }
            break;
          case 2 :
          for (j=0; hint1[j]!='\0'; j++){
            grid[3][j].background = newEntity(passable, hint2[j], j, 3);
-          //  printf("cnt=%d, string= %c\n", j, hint1);
            }
            break;
         }
