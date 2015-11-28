@@ -32,9 +32,7 @@ void enc_Hint(int game);
 int encryptionNew(SDL_Simplewin *sw)
 {
   char *list[] = {"frondo", "gandalf","elrond", "legolas", "gimli", "aragorn","saouron"};
-  char hint0[]={"vowel             b"};
-  char hint1[]={"consonant               b"};
-  char hint2[]={"switch                 b"};
+
   char rand_word[LENGTH], shuffle_word[LENGTH], orginal_word[LENGTH];
   int i, word_size, j, yinit = H/2, xinit = 2, cnt=0, game;
   cell grid[H][W];
@@ -64,7 +62,7 @@ int encryptionNew(SDL_Simplewin *sw)
   grid[yinit][xinit-1].background = newEntity(passable,'<',xinit-1,yinit);
   grid[yinit][xinit+word_size].background = newEntity(passable,'>',xinit+word_size,yinit);
   grid[0][0].background = newEntity(passable,'r',0,0);
-  grid[0][1].background = newEntity(passable,'H',0,1);
+  grid[10][10].background = newEntity(passable,'H',10,10);
 
 
 
@@ -74,6 +72,12 @@ int encryptionNew(SDL_Simplewin *sw)
 
   /* MAIN LOOP */
   while(!sw->finished){
+    char hint0[]="vowel"; //variables have to be declared here otherwise dont work
+    char hint1[]="consonant";
+    char hint2[]="whole row";
+
+    printf("%s", hint1);
+
     in=input(sw);
     if( (in > 0) && (in < 5) ){ /*checks for arrowkeys */
       move(&grid[player->y][player->x],player->x,player->y,in,grid);
@@ -86,42 +90,39 @@ int encryptionNew(SDL_Simplewin *sw)
     else if(grid[player->y][player->x].background->type == '^') {
         enc_updateLetter(grid, player->y, player->x);
       }
-      else if(grid[player->y][player->x].background->type == '<') {
-          enc_changeRow(shuffle_word, word_size, 1);
-          for (j=0; j<word_size; j++){
-            enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
-          }
-        }
-     else if(grid[player->y][player->x].background->type == '>') {
+    else if(grid[player->y][player->x].background->type == '>') {
          enc_changeRow(shuffle_word, word_size, -1);
          for (j=0; j<word_size; j++){
            enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
          }
       }
-      else if(grid[player->y][player->x].background->type == 'r') {
+    else if(grid[player->y][player->x].background->type == 'r') {
          for (j=0; j<word_size; j++){
            enc_newLetter(grid, xinit+j, yinit, orginal_word[j]);
          }
        }
-       else if(grid[player->y][player->x].background->type == 'H') {
-         switch (game){
-           case 0:
-           for (j=0; j<10; j++){
-               grid[3][j].background = newEntity(passable, hint0[j], xinit+j, 3);
-            }
-             break;
-           case 1 :
-           for (j=0; j<10; j++){
-             grid[3][j].background = newEntity(passable, hint1[j], j, 3);
-             }
-             break;
-           case 2 :
-           for (j=0; j<10; j++){
-             grid[3][j].background = newEntity(passable, hint2[j], xinit+j, 3);
-             }
-             break;
-          }
+     else if(grid[player->y][player->x].background->type == 'H') {
+       switch (game){
+         case 0:
+         for (j=0; hint1[j]!='\0'; j++){
+           grid[3][j].background = newEntity(passable, hint0[j], j, 3);
+          //  printf("cnt=%d, string= %c\n", j, hint1);
+           }
+           break;
+         case 1 :
+         for (j=0; hint1[j]!='\0'; j++){
+           grid[3][j].background = newEntity(passable, hint1[j], j, 3);
+          //  printf("cnt=%d, string= %c\n", j, hint1);
+           }
+           break;
+         case 2 :
+         for (j=0; hint1[j]!='\0'; j++){
+           grid[3][j].background = newEntity(passable, hint2[j], j, 3);
+          //  printf("cnt=%d, string= %c\n", j, hint1);
+           }
+           break;
         }
+      }
       }
 
 
@@ -211,7 +212,6 @@ int enc_shufle(char word[LENGTH], int size){
   int game ;
 
   game = rand()%3;
-  game=1;
   switch (game){
     case 0:
       // printf("we are going to change a vowel\n\n");

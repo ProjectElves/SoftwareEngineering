@@ -17,8 +17,8 @@ int main(int argc, char **argv)
    printf("3.Test Grid\n");
    printf("4.Test input\n");
    printf("5.Binary game/grid integration\n");
-   scanf("%d", &select );
    }
+   select=2;
    swin=&sw;
 switch (select) {
   case 1:
