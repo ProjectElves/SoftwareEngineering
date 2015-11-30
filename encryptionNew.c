@@ -105,6 +105,10 @@ int encryptionNew(SDL_Simplewin *sw)
            enc_newLetter(grid, xinit+j, yinit, orginal_word[j]);
            for (j=0; reset[j]!='\0'; j++){
              grid[2][j].background = newEntity(passable, reset[j], j, 2);
+               if(j>1000){
+                  printf("infinite loop detected!!");
+               exit(EXIT_FAILURE);
+             }
              }
          }
        }
