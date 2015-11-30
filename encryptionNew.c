@@ -112,7 +112,7 @@ int encryptionNew(SDL_Simplewin *sw)
          }
       }
       else if(grid[player->y][player->x].background->type == 'r') {
-         for (j=0; j<6; j++){ // 6 cause that is the size of reset
+         for (j=0; reset[j]!='\0'; j++){ // 6 cause that is the size of 'reset'
             enc_newLetter(grid, xinit+j, yinit, orginal_word[j]);
             for (j=0; reset[j]!='\0'; j++){
                grid[2][j].background = newEntity(passable, reset[j], j, 2);
