@@ -33,7 +33,7 @@ int encryptionNew(SDL_Simplewin *sw)
 {
   char *list[] = {"frondo", "gandalf","elrond", "legolas", "gimli", "aragorn","saouron"};
 
-  char rand_word[LENGTH], shuffle_word[LENGTH], orginal_word[LENGTH];
+  char rand_word[LENGTH], shuffle_word[LENGTH], original_word[LENGTH];
   int i, word_size, j, yinit = H/2, xinit = 2, cnt=0, game;
   cell grid[H][W];
   entity *player;
@@ -41,7 +41,7 @@ int encryptionNew(SDL_Simplewin *sw)
   initGrid(grid);
 
   srand(time(NULL));
-  if (sscanf(list[1/*(rand()%LIST_SIZE)*/], "%s", rand_word) != 1){
+  if (sscanf(list[(rand()%LIST_SIZE)], "%s", rand_word) != 1){
     printf("couldn't get a word from the list\n");
     return 1;
   }
@@ -53,8 +53,8 @@ int encryptionNew(SDL_Simplewin *sw)
   // printf("\nThe initial word is %s and ", shuffle_word);
   game = enc_shufle(shuffle_word, word_size);
   // printf("%s\n", shuffle_word);
-  strcpy(orginal_word, shuffle_word);
-  // printf("%s\n",orginal_word );
+  strcpy(original_word, shuffle_word);
+  // printf("%s\n",original_word );
   player = grid[10][10].foreground = newEntity(passable,'@',10,10);
   /* place the word in the grid */
   for (j=0; j<word_size; j++){
@@ -112,11 +112,11 @@ int encryptionNew(SDL_Simplewin *sw)
          }
       }
       else if(grid[player->y][player->x].background->type == 'r') {
-         for (j=0; reset[j]!='\0'; j++){ // 6 cause that is the size of 'reset'
-            enc_newLetter(grid, xinit+j, yinit, orginal_word[j]);
-            for (j=0; reset[j]!='\0'; j++){
-               grid[2][j].background = newEntity(passable, reset[j], j, 2);
-            }
+         for (i=0; i<word_size; i++){
+            enc_newLetter(grid, xinit+i, yinit, original_word[i]);
+         }
+         for (j=0; reset[j]!='\0'; j++){
+            grid[2][j].background = newEntity(passable, reset[j], j, 2);
          }
       }
       else if(grid[player->y][player->x].background->type == 'H') {
@@ -143,7 +143,8 @@ int encryptionNew(SDL_Simplewin *sw)
 
     enc_updateWord(grid, yinit, xinit, shuffle_word);
     printGrid(grid);
-    printf("%s\n",shuffle_word);
+    printf("shuffle: %s\n",shuffle_word);
+    printf("original: %s\n",original_word);
     if(strcmp(shuffle_word, rand_word)==0){
       break;
     }
