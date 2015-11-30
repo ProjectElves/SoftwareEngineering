@@ -41,7 +41,7 @@ int encryptionNew(SDL_Simplewin *sw)
   initGrid(grid);
 
   srand(time(NULL));
-  if (sscanf(list[(rand()%LIST_SIZE)], "%s", rand_word) != 1){
+  if (sscanf(list[1/*(rand()%LIST_SIZE)*/], "%s", rand_word) != 1){
     printf("couldn't get a word from the list\n");
     return 1;
   }
@@ -52,8 +52,9 @@ int encryptionNew(SDL_Simplewin *sw)
   shuffle_word[word_size] = '\0';
   // printf("\nThe initial word is %s and ", shuffle_word);
   game = enc_shufle(shuffle_word, word_size);
-  printf("%s\n", shuffle_word);
+  // printf("%s\n", shuffle_word);
   strcpy(orginal_word, shuffle_word);
+  // printf("%s\n",orginal_word );
   player = grid[10][10].foreground = newEntity(passable,'@',10,10);
   /* place the word in the grid */
   for (j=0; j<word_size; j++){
@@ -72,8 +73,8 @@ int encryptionNew(SDL_Simplewin *sw)
 
   /* MAIN LOOP */
   while(!sw->finished){
-    char hint0[]="vowel"; //variables have to be declared here otherwise dont work
-    char hint1[]="consonant";
+    char hint0[]="vowel(s)"; //variables have to be declared here otherwise dont work
+    char hint1[]="consonant(s)";
     char hint2[]="whole row";
     char reset[]="reset";
 
@@ -82,38 +83,44 @@ int encryptionNew(SDL_Simplewin *sw)
     in=input(sw);
     for (j=0; reset[j]!='\0'; j++){ //makes reset dissappear if set
       grid[2][j].background = newEntity(passable, '.', j, 2);
+      if(j>1000){  //cause some times we have an infinate loop for some reason
+      printf("infinite loop detected!!");
+      exit(EXIT_FAILURE);
+      }
     }
-    if( (in > 0) && (in < 5) ){ /*checks for arrowkeys */
+   if( (in > 0) && (in < 5) ){ /*checks for arrowkeys */
       move(&grid[player->y][player->x],player->x,player->y,in,grid);
       printGrid(grid);
-    }
-    if (in == 9) { /*checks for spacebar */
+   }
+   if (in == 9) { /*checks for spacebar */
       if(grid[player->y][player->x].background->type == 'v') {
         enc_updateLetter(grid, player->y, player->x);
       }
-    else if(grid[player->y][player->x].background->type == '^') {
-        enc_updateLetter(grid, player->y, player->x);
+      else if(grid[player->y][player->x].background->type == '^') {
+         enc_updateLetter(grid, player->y, player->x);
       }
-    else if(grid[player->y][player->x].background->type == '>') {
+      else if(grid[player->y][player->x].background->type == '>') {
          enc_changeRow(shuffle_word, word_size, -1);
          for (j=0; j<word_size; j++){
            enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
          }
       }
-    else if(grid[player->y][player->x].background->type == 'r') {
+      else if(grid[player->y][player->x].background->type == '<') {
+         enc_changeRow(shuffle_word, word_size, 1);
          for (j=0; j<word_size; j++){
-           enc_newLetter(grid, xinit+j, yinit, orginal_word[j]);
-           for (j=0; reset[j]!='\0'; j++){
-             grid[2][j].background = newEntity(passable, reset[j], j, 2);
-               if(j>1000){
-                  printf("infinite loop detected!!");
-               exit(EXIT_FAILURE);
-             }
-             }
+           enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
          }
-       }
-     else if(grid[player->y][player->x].background->type == 'H') {
-       switch (game){
+      }
+      else if(grid[player->y][player->x].background->type == 'r') {
+         for (j=0; j<6; j++){ // 6 cause that is the size of reset
+            enc_newLetter(grid, xinit+j, yinit, orginal_word[j]);
+            for (j=0; reset[j]!='\0'; j++){
+               grid[2][j].background = newEntity(passable, reset[j], j, 2);
+            }
+         }
+      }
+      else if(grid[player->y][player->x].background->type == 'H') {
+        switch (game){
          case 0:
          for (j=0; hint1[j]!='\0'; j++){
            grid[3][j].background = newEntity(passable, hint0[j], j, 3);
@@ -129,9 +136,9 @@ int encryptionNew(SDL_Simplewin *sw)
            grid[3][j].background = newEntity(passable, hint2[j], j, 3);
            }
            break;
-        }
+         }
       }
-      }
+   }
 
 
     enc_updateWord(grid, yinit, xinit, shuffle_word);
@@ -141,7 +148,7 @@ int encryptionNew(SDL_Simplewin *sw)
       break;
     }
     cnt++;
-  }
+   }
   printf("you win in %d moves\n", cnt);
   freeEntityMem(grid);  /* free memory */
   return 0;
