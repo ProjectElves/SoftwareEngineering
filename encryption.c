@@ -26,7 +26,7 @@ int enc_winCheck(char grid[GRIDSIZE][GRIDSIZE], int wordLength, int wordStart, c
 int encryption(void)
 {
 
-  char *list[] = {(char*)"frondo"};
+  char *list[] = {"frondo", "gandalf","elrond", "legolas", "gimli", "aragorn","saouron"};
   char rand_word[LENGTH], shuffle_word[LENGTH];
   int i, word_size;
   char grid[GRIDSIZE][GRIDSIZE], avatar = '@';

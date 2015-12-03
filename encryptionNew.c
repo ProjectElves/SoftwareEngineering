@@ -27,9 +27,10 @@ void enc_letterDown(entity *e);
 void enc_letterUp(entity *e);
 void enc_updateWord(cell grid[H][W], int y, int x, char shuffle[LENGTH]);
 void enc_Hint(int game);
+void enc_print_ascii(char letter);
 
 
-int encryptionNew(SDL_Simplewin *sw)
+int encryptionNew(Display *sw)
 {
   char *list[] = {"frondo", "gandalf","elrond", "legolas", "gimli", "aragorn","saouron"};
 
@@ -61,7 +62,7 @@ int encryptionNew(SDL_Simplewin *sw)
     enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
   }
   grid[yinit][xinit-1].background = newEntity(passable,'<',xinit-1,yinit);
-  grid[yinit][xinit+word_size].background = newEntity(passable,'>',xinit+word_size,yinit);
+  grid[yinit][xinit + word_size].background = newEntity(passable,'>',xinit + word_size, yinit);
   grid[0][0].background = newEntity(passable,'r',0,0);
   grid[10][10].background = newEntity(passable,'H',10,10);
 
@@ -83,10 +84,6 @@ int encryptionNew(SDL_Simplewin *sw)
     in=input(sw);
     for (j=0; reset[j]!='\0'; j++){ //makes reset dissappear if set
       grid[2][j].background = newEntity(passable, '.', j, 2);
-      if(j>1000){  //cause some times we have an infinate loop for some reason
-      printf("infinite loop detected!!");
-      exit(EXIT_FAILURE);
-      }
     }
    if( (in > 0) && (in < 5) ){ /*checks for arrowkeys */
       move(&grid[player->y][player->x],player->x,player->y,in,grid);
@@ -140,19 +137,30 @@ int encryptionNew(SDL_Simplewin *sw)
       }
    }
 
-
-    enc_updateWord(grid, yinit, xinit, shuffle_word);
-    printGrid(grid);
-    printf("shuffle: %s\n",shuffle_word);
-    printf("original: %s\n",original_word);
-    if(strcmp(shuffle_word, rand_word)==0){
+   enc_updateWord(grid, yinit, xinit, shuffle_word);
+   printGrid(grid);
+   // printf("shuffle: %s\n",shuffle_word);
+   // printf("original: %s\n",original_word);
+   // I pass the letter of the collum I'm in
+   enc_print_ascii(grid[yinit][player->x].background->type);
+   if(strcmp(shuffle_word, rand_word)==0){
       break;
-    }
+   }
     cnt++;
    }
   printf("you win in %d moves\n", cnt);
   freeEntityMem(grid);  /* free memory */
   return 0;
+}
+
+
+void enc_print_ascii(char letter){
+   if ((letter < 'a') || (letter > 'z')){
+      printf("ascii code: %c\n",' ' );
+   }
+   else{
+   printf("ascii code: %d\n", letter);
+   }
 }
 
 void enc_Hint(int game){
@@ -182,11 +190,11 @@ void enc_updateLetter(cell grid[H][W], int y, int x){
 
    if ((grid[y][x].background->type == 'v') &&
       (grid[y][x].background->pointsto != NULL)) {// cause 'v' may be from the word
-     enc_letterUp(grid[y][x].background->pointsto);
+     enc_letterDown(grid[y][x].background->pointsto);
    }
    // we don't have && cause '^' is surely not part of the word
    if (grid[y][x].background->type == '^'){
-     enc_letterDown(grid[y][x].background->pointsto);
+     enc_letterUp(grid[y][x].background->pointsto);
    }
 }
 

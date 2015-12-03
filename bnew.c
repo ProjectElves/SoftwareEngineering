@@ -1,3 +1,5 @@
+/* This is the binary game's integration with the grid.  */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
@@ -6,6 +8,8 @@
 #define BYTE_L 8
 
 int binResult(entity *byte[BYTE_L]);
+/* creates a new bulb-switch pair */
+entity *newBulb(cell grid[H][W], int x, int y);
 
 int bgame (SDL_Simplewin *sw)
 {
@@ -13,7 +17,7 @@ int bgame (SDL_Simplewin *sw)
   entity *player, *byte[BYTE_L];
   int in;
   int goal,res;
-  
+
   initGrid(grid);
   /* place player */
   player = grid[6][6].foreground = newEntity(passable,'@',6,6);
@@ -28,11 +32,11 @@ int bgame (SDL_Simplewin *sw)
   byte[0] = newBulb(grid, 9, 1);
   /*layer of floortiles */
   fillGrid(grid);
-  
+
   goal = rand()%255;
   printf("try summing %d\n", goal );
   printf("result: %d\n", binResult(byte) );
-   
+
   /* MAIN LOOP */
 	while(!sw->finished){
     in=input(sw);
@@ -60,7 +64,7 @@ int bgame (SDL_Simplewin *sw)
       break;
     }
   }
-  
+
   printf("you win\n");
 	freeEntityMem(grid);  /* free memory */
   return 0;
@@ -80,4 +84,13 @@ int binResult(entity *byte[BYTE_L])
     }
   }
   return((int)result);
+}
+
+entity *newBulb(cell grid[H][W], int x, int y)
+{
+  grid[y][x].background = newEntity(passable,'0',x,y);
+  grid[y+3][x].background = newEntity(passable,'-',x,y+3);
+  grid[y+3][x].background->pointsto = grid[y][x].background;
+
+  return grid[y][x].background;
 }
