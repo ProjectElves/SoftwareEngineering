@@ -81,7 +81,7 @@ void fillGrid(cell grid[H][W])
   for(HCnt=0; HCnt<H; HCnt++){
     for(WCnt=0; WCnt<W; WCnt++){
       if (grid[HCnt][WCnt].background == NULL) {
-        grid[HCnt][WCnt].background = newEntity(0,'.',WCnt,HCnt);
+        grid[HCnt][WCnt].background = newEntity(passable,'.',WCnt,HCnt);
       }
     }
   }

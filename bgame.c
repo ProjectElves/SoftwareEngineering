@@ -16,7 +16,7 @@ int bgame (Display *sw)
   for (i = BYTE_L, j = (W / 2) - (BYTE_L / 2); i > 0; i--, j++) {
     byte[i-1] = newBulb(grid, j, 1);
   }
-  
+
   // Dividing wall
   for (i = 1; i < W - 1; i++) {
     newWall(grid, i, 3);
@@ -49,14 +49,14 @@ int bgame (Display *sw)
         changeEntity(grid[player->y][player->x].background,'+');
         updateEntities(grid);
         printGrid(grid);
-        Mix_PlayChannel( -1, sw->zap, 0 );
+        //Mix_PlayChannel( -1, sw->zap, 0 );
       }
 	  else if( grid[player->y][player->x].background != NULL
       &&  grid[player->y][player->x].background->type == '+') {
         changeEntity(grid[player->y][player->x].background,'-');
         updateEntities(grid);
         printGrid(grid);
-        Mix_PlayChannel( -1, sw->zap, 0 );
+        //Mix_PlayChannel( -1, sw->zap, 0 );
       }
     }
     drawEntities(sw, grid);

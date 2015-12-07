@@ -1,33 +1,5 @@
-/*new encrytion game encorpoprating the grid
-tasks -
-1. make movement change the word done
-2. shuffling whole row done
-3. changing whole row done
-4. reset button done
-5. cnt for score done
-6. when shuffling shuffles all characters of the same type
-7. printing hint on the grid stay there,
-8. printing when reset for one cycle
-9. not picking up elrond
- */
-
 #include "encryption.h"
-#include "game.h"
 
-int enc_shufle(char word[LENGTH], int size);
-int enc_isenc_vowel(char c);
-char enc_vowel();
-char enc_constant();
-void enc_changeRow(char word[LENGTH], int size, int shift);
-void enc_change(char word[LENGTH], int size, int game);
-void encrytionGridInit(char *shuffle_word);
-void enc_newLetter(cell grid[H][W], int x, int y, char c);
-void enc_updateLetter(cell grid[H][W], int y, int x);
-void enc_letterDown(entity *e);
-void enc_letterUp(entity *e);
-void enc_updateWord(cell grid[H][W], int y, int x, char shuffle[LENGTH]);
-void enc_Hint(int game);
-void enc_print_ascii(char letter);
 
 
 int encryptionNew(Display *sw)
@@ -56,20 +28,33 @@ int encryptionNew(Display *sw)
   // printf("%s\n", shuffle_word);
   strcpy(original_word, shuffle_word);
   // printf("%s\n",original_word );
-  player = grid[10][10].foreground = newEntity(passable,'@',10,10);
+  player = grid[6][6].foreground = newEntity(passable,'@',6,6);
   /* place the word in the grid */
   for (j=0; j<word_size; j++){
     enc_newLetter(grid, xinit+j, yinit, shuffle_word[j]);
   }
+
+  // Dividing wall
+  for (i = 1; i < W - 1; i++) {
+    newWall(grid, i, 3);
+  }
+
+  // Creates the boundary walls
+  createBoundingWalls(grid);
+
+  /* layer of floortiles */
+  fillGrid(grid);
+
+  drawEntities(sw, grid);
+  drawFrame(sw, 20);
+
   grid[yinit][xinit-1].background = newEntity(passable,'<',xinit-1,yinit);
   grid[yinit][xinit + word_size].background = newEntity(passable,'>',xinit + word_size, yinit);
-  grid[0][0].background = newEntity(passable,'r',0,0);
-  grid[10][10].background = newEntity(passable,'H',10,10);
+  grid[8][1].background = newEntity(passable,'r',8,1);
+  grid[8][9].background = newEntity(passable,'H',8,9);
 
 
 
-  /*layer of floor tiles */
-  fillGrid(grid);
   printf("try to find the correct word");
 
   /* MAIN LOOP */
@@ -113,24 +98,24 @@ int encryptionNew(Display *sw)
             enc_newLetter(grid, xinit+i, yinit, original_word[i]);
          }
          for (j=0; reset[j]!='\0'; j++){
-            grid[2][j].background = newEntity(passable, reset[j], j, 2);
+            grid[1][j+2].background = newEntity(passable, reset[j], j, 2);
          }
       }
       else if(grid[player->y][player->x].background->type == 'H') {
         switch (game){
          case 0:
          for (j=0; hint1[j]!='\0'; j++){
-           grid[3][j].background = newEntity(passable, hint0[j], j, 3);
+           grid[2][j+2].background = newEntity(passable, hint0[j], j, 3);
            }
            break;
          case 1 :
          for (j=0; hint1[j]!='\0'; j++){
-           grid[3][j].background = newEntity(passable, hint1[j], j, 3);
+           grid[2][j+2].background = newEntity(passable, hint1[j], j, 3);
            }
            break;
          case 2 :
          for (j=0; hint1[j]!='\0'; j++){
-           grid[3][j].background = newEntity(passable, hint2[j], j, 3);
+           grid[2][j+2].background = newEntity(passable, hint2[j], j, 3);
            }
            break;
          }
@@ -142,6 +127,8 @@ int encryptionNew(Display *sw)
    // printf("shuffle: %s\n",shuffle_word);
    // printf("original: %s\n",original_word);
    // I pass the letter of the collum I'm in
+   drawEntities(sw, grid);
+   drawFrame(sw, 20);
    enc_print_ascii(grid[yinit][player->x].background->type);
    if(strcmp(shuffle_word, rand_word)==0){
       break;

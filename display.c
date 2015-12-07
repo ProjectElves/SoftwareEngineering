@@ -7,13 +7,13 @@ Display *newDisplay()
   if (r < 0){
     fail("Unable to initialize SDL");
   }
-   /*Initialize SDL_mixer*/
+   /*Initialize SDL_mixer
     r= Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 );
     if(r < 0 ) {
       printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n",
       Mix_GetError() );
       return(0);
-    }
+    }*/
     d->win = SDL_CreateWindow("Project Elves", SDL_WINDOWPOS_UNDEFINED,
                 SDL_WINDOWPOS_UNDEFINED, WWIDTH, WHEIGHT, SDL_WINDOW_SHOWN);
     if (d->win == NULL){
@@ -23,7 +23,7 @@ Display *newDisplay()
     SDL_SetRenderDrawColor(d->renderer, 0, 0, 0, 0);
     SDL_RenderClear(d->renderer);
 
-    /*MIXER-START*/
+    /*MIXER-START
     d->zap = Mix_LoadWAV("files/click.wav");
     Mix_VolumeChunk(d->zap, 15);
     if (d->zap==NULL){

@@ -17,7 +17,7 @@ int main(int argc, char **argv)
    }
    else{
   //  printf("1.Binary Game\n");
-  //  printf("2.Encryption Game\n");
+   printf("2.Encryption Game\n");
   //  printf("3.Test Grid\n");
    printf("4.Test input\n");
    printf("5.Binary game/grid integration\n");
@@ -28,10 +28,10 @@ switch (select) {
   //    if(binaryGame()==1){printf("everything OK\n");}
   //    else{printf("ERROR \n");}
   //    break;
-  // case 2:
-  //    if(encryption()==0){printf("everything OK\n");}
-  //    else{printf("ERROR \n");}
-  //    break;
+   case 2:
+      if(encryptionNew(d)==0){printf("everything OK\n");}
+      else{printf("ERROR \n");}
+      break;
   // case 3:
   //    if(gridmain(swin)==0){printf("everything OK\n");}
   //    else{printf("ERROR \n");}
