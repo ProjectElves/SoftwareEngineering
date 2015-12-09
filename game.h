@@ -1,3 +1,9 @@
+<<<<<<< HEAD
+#include "binaryGame.h"
+#include "encryption.h"
+#include "grid.h"
+=======
+>>>>>>> SDL
 #include "input.h"
 
 int binaryGame(void);
