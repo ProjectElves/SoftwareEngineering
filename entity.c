@@ -1,5 +1,4 @@
 #include "entity.h"
-
 entity *newEntity(int ispassable, char type, int x, int y)
 {
   entity *e = malloc(sizeof(entity));

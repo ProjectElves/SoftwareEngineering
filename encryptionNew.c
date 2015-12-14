@@ -1,3 +1,5 @@
+// When changing a vowel the 'up' and 'down' buttons will only change to vowels
+// same with consonant
 #include "encryption.h"
 
 
@@ -51,7 +53,7 @@ int encryptionNew(Display *sw)
   grid[yinit][xinit-1].background = newEntity(passable,'<',xinit-1,yinit);
   grid[yinit][xinit + word_size].background = newEntity(passable,'>',xinit + word_size, yinit);
   grid[8][1].background = newEntity(passable,'r',8,1);
-  grid[8][9].background = newEntity(passable,'H',8,9);
+  grid[8][9].background = newEntity(passable,'&',8,9);
 
 
 
@@ -59,27 +61,24 @@ int encryptionNew(Display *sw)
 
   /* MAIN LOOP */
   while(!sw->finished){
-    char hint0[]="vowel(s)"; //variables have to be declared here otherwise dont work
-    char hint1[]="consonant(s)";
-    char hint2[]="whole row";
-    char reset[]="reset";
-
-    printf("%s", hint1);
-
-    in=input(sw);
-    for (j=0; reset[j]!='\0'; j++){ //makes reset dissappear if set
-      grid[2][j].background = newEntity(passable, '.', j, 2);
-    }
+      char hint0[]={"vowel"}; //variables have to be declared here otherwise dont work
+      char hint1[]={"consonant"};
+      char hint2[]={"whole row"};
+      char reset[]={"reset"};
+      in=input(sw);
+      for (j=0; reset[j]!='\0'; j++){ //makes reset dissappear if set
+         grid[2][j].background = newEntity(passable, '.', j, 2);
+      }
    if( (in > 0) && (in < 5) ){ /*checks for arrowkeys */
       move(&grid[player->y][player->x],player->x,player->y,in,grid);
       printGrid(grid);
    }
    if (in == 9) { /*checks for spacebar */
-      if(grid[player->y][player->x].background->type == 'v') {
-        enc_updateLetter(grid, player->y, player->x);
+   if(grid[player->y][player->x].background->type == '$') {// "$" is now the down arrow symbol
+        enc_shiftLetter(grid, player->y, player->x);
       }
       else if(grid[player->y][player->x].background->type == '^') {
-         enc_updateLetter(grid, player->y, player->x);
+         enc_shiftLetter(grid, player->y, player->x);
       }
       else if(grid[player->y][player->x].background->type == '>') {
          enc_changeRow(shuffle_word, word_size, -1);
@@ -98,30 +97,31 @@ int encryptionNew(Display *sw)
             enc_newLetter(grid, xinit+i, yinit, original_word[i]);
          }
          for (j=0; reset[j]!='\0'; j++){
-            grid[1][j+2].background = newEntity(passable, reset[j], j, 2);
+            grid[2][j+5].background = newEntity(passable, reset[j], j+5, 2);
          }
       }
-      else if(grid[player->y][player->x].background->type == 'H') {
+      else if(grid[player->y][player->x].background->type == '&') {// "&" is now the hint symbol
         switch (game){
          case 0:
-         for (j=0; hint1[j]!='\0'; j++){
-           grid[2][j+2].background = newEntity(passable, hint0[j], j, 3);
+         for (j=0; hint0[j]!='\0'; j++){
+           grid[1][j+5].background = newEntity(passable, hint0[j], j+5, 1);
            }
            break;
          case 1 :
          for (j=0; hint1[j]!='\0'; j++){
-           grid[2][j+2].background = newEntity(passable, hint1[j], j, 3);
+           grid[1][j+3].background = newEntity(passable, hint1[j], j+3, 1);
            }
            break;
          case 2 :
-         for (j=0; hint1[j]!='\0'; j++){
-           grid[2][j+2].background = newEntity(passable, hint2[j], j, 3);
+         for (j=0; hint2[j]!='\0'; j++){
+           grid[1][j+3].background = newEntity(passable, hint2[j], j+3, 1);
            }
            break;
          }
+         drawEntities(sw, grid);
+         drawFrame(sw, 20);
       }
    }
-
    enc_updateWord(grid, yinit, xinit, shuffle_word);
    printGrid(grid);
    // printf("shuffle: %s\n",shuffle_word);
@@ -141,26 +141,13 @@ int encryptionNew(Display *sw)
 }
 
 
+
 void enc_print_ascii(char letter){
    if ((letter < 'a') || (letter > 'z')){
       printf("ascii code: %c\n",' ' );
    }
    else{
    printf("ascii code: %d\n", letter);
-   }
-}
-
-void enc_Hint(int game){
-   switch (game){
-     case 0:
-       printf("change a vowel\n\n");
-       break;
-     case 1 :
-       printf("change a constant\n\n" );
-       break;
-     case 2 :
-       printf("switch the whole row\n\n" );
-       break;
    }
 }
 
@@ -173,15 +160,32 @@ void enc_updateWord(cell grid[H][W], int y, int x, char shuffle[LENGTH]){
    }
 }
 
+// this is a new function that vowels change only to vowels and likewise with consonants
+void enc_shiftLetter(cell grid[H][W], int y, int x){
+   entity *e;
+
+   e = grid[y][x].background->pointsto;
+   if (isvowel(e->type)){
+      do {
+         enc_updateLetter(grid, y, x);
+         e = grid[y][x].background->pointsto;
+      } while(isvowel(e->type) == FALSE);
+   }
+   else if ( ! (isvowel(e->type))) {
+      do {
+         enc_updateLetter(grid, y, x);
+         e = grid[y][x].background->pointsto;
+      } while(isvowel(e->type) == TRUE);
+   }
+}
+
 void enc_updateLetter(cell grid[H][W], int y, int x){
 
-   if ((grid[y][x].background->type == 'v') &&
-      (grid[y][x].background->pointsto != NULL)) {// cause 'v' may be from the word
-     enc_letterDown(grid[y][x].background->pointsto);
+   if (grid[y][x].background->type == '$') {// cause 'v' may be part of the word
+    enc_letterDown(grid[y][x].background->pointsto);
    }
-   // we don't have && cause '^' is surely not part of the word
    if (grid[y][x].background->type == '^'){
-     enc_letterUp(grid[y][x].background->pointsto);
+    enc_letterUp(grid[y][x].background->pointsto);
    }
 }
 
@@ -215,7 +219,7 @@ void enc_newLetter(cell grid[H][W], int x, int y, char c){
   grid[y][x].background = newEntity(passable, c, x, y);
   grid[y-1][x].background = newEntity(passable,'^',x,y-1);
   grid[y-1][x].background->pointsto = grid[y][x].background;
-  grid[y+1][x].background = newEntity(passable,'v',x,y-1);
+  grid[y+1][x].background = newEntity(passable,'$',x,y-1);
   grid[y+1][x].background->pointsto = grid[y][x].background;
 }
 
@@ -310,4 +314,14 @@ char enc_constant(){
   char letter[] = {'b','c','d','f','g','h','j','k','l','m','n','p','q',
                     'r','s','t','v','w','x','y','z'};
   return letter[rand()%21];
+}
+
+int isvowel(char c){
+   c=tolower(c);
+   if ((c=='a') || (c=='e') || (c=='i') || (c=='o') || (c=='u')){
+      return 1;
+   }
+   else{
+      return 0;
+   }
 }

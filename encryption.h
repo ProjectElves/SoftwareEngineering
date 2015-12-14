@@ -10,6 +10,9 @@
 #define LENGTH 30
 #define LIST_SIZE 7
 #define ALPHABET 26
+#define VOWEL 1
+#define CONSONANT 2
+#define ROW 3
 
 int enc_shufle(char word[LENGTH], int size);
 int enc_isenc_vowel(char c);
@@ -19,9 +22,10 @@ void enc_changeRow(char word[LENGTH], int size, int shift);
 void enc_change(char word[LENGTH], int size, int game);
 void encrytionGridInit(char *shuffle_word);
 void enc_newLetter(cell grid[H][W], int x, int y, char c);
+void enc_shiftLetter(cell grid[H][W], int y, int x);
 void enc_updateLetter(cell grid[H][W], int y, int x);
 void enc_letterDown(entity *e);
 void enc_letterUp(entity *e);
 void enc_updateWord(cell grid[H][W], int y, int x, char shuffle[LENGTH]);
-void enc_Hint(int game);
 void enc_print_ascii(char letter);
+int isvowel(char c);
